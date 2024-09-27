@@ -17,7 +17,6 @@ async def convert_degrees_to_direction(degrees):
     return DIRECTIONS[index]
 
 async def convert_weather_code_to_string(code: int) -> str:
-    ...
     WEATHER_STATUSES: Dict = {
         0: "Чистое небо",
         (1, 2, 3): "В основном ясно, частично облачно, и облачно",
@@ -44,7 +43,3 @@ async def convert_weather_code_to_string(code: int) -> str:
     return None
 
 
-async def run_task_periodically(interval: int, func: Coroutine):
-    while True:
-        await func()
-        await asyncio.sleep(interval) 

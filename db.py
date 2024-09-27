@@ -8,8 +8,10 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 from datetime import datetime
 from typing import Optional, List
 from sqlalchemy.future import select
+import logging
 
-from settings import LOGGER
+logging.basicConfig()
+logging.getLogger('sqlalchemy').setLevel(logging.ERROR)
 
 Base = declarative_base()
 
@@ -42,16 +44,12 @@ async def create_and_add_info(temperature: float, direction: str,
             
             if not table_exists:
                 await conn.run_sync(Base.metadata.create_all)
-                LOGGER.info("Таблица 'weather_info' создана.")
             
             await add_weather_info(temperature, direction, pressure_above_sea, 
                                 surface_pressure, precipation, current_weather)
-            LOGGER.info("Новые данные были добавлены в WeatherInfo")
 
     except Exception as e:
-        LOGGER.error("Error occurred while working with table WeatherInfo: "
-                     f"{e}")
-
+        pass 
 async def add_weather_info(temperature, direction, pressure_above_sea, 
                             surface_pressure, precipation, current_weather):
     try:
@@ -69,20 +67,27 @@ async def add_weather_info(temperature, direction, pressure_above_sea,
             )
             session.add(new_weather_entry)
             await session.commit()
-            LOGGER.info("Данные о погоде успешно добавлены.")
     except Exception as e:
-        LOGGER.error("Error occurred while adding info to table WeatherInfo:"
-        f" {e}")
-
+        pass
 
 async def get_all_weather_info() -> Optional[List[WeatherInfo]]:
     try:
         async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
         async with async_session() as session:
-            result = await session.execute(select(WeatherInfo))  
-            weather_info_list: List[WeatherInfo] = result.scalars().all()  
+            result = await session.execute(
+                select(
+                    WeatherInfo.id, 
+                    WeatherInfo.temperature, 
+                    WeatherInfo.current_weather, 
+                    WeatherInfo.direction, 
+                    WeatherInfo.precipation,
+                    WeatherInfo.pressure_above_sea,
+                    WeatherInfo.surface_pressure, 
+                    WeatherInfo.current_date)
+            )
+            weather_info_list = result.all()  
             return weather_info_list
     except Exception as e:
-        LOGGER.error(f"Error occurred while fetching data from table WeatherInfo: {e}")
         return None
+
 
