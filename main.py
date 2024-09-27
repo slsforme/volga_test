@@ -122,6 +122,7 @@ async def export_data_to_xlsx():
     wb.save(f"{now.strftime('%Y-%m-%d %H-%M-%S')}.xlsx")
 
 async def menu():
+    # TODO: fix постоянное зависание
     while True:
         try:
             option = int(input('Введите 1, если хотите импортировать последние 10 записей из БД в файл,\n'
