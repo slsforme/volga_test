@@ -8,10 +8,7 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 from datetime import datetime
 from typing import Optional, List
 from sqlalchemy.future import select
-import logging
-
-logging.basicConfig()
-logging.getLogger('sqlalchemy').setLevel(logging.ERROR)
+from settings import LOGGER
 
 Base = declarative_base()
 
@@ -71,7 +68,9 @@ async def create_and_add_info(temperature: float, direction: str,
                                 current_weather)
 
     except Exception as e:
-        pass 
+        LOGGER.error("Error occurred while getting data from DB: "
+        f"{e} (error)")
+        
 async def add_weather_info(temperature, direction, pressure_above_sea, 
                             surface_pressure, precipation, current_weather):
     """
@@ -108,7 +107,8 @@ async def add_weather_info(temperature, direction, pressure_above_sea,
             session.add(new_weather_entry)
             await session.commit()
     except Exception as e:
-        pass
+        LOGGER.error("Error occurred while getting data from DB: "
+        f"{e} (error)")
 
 async def get_all_weather_info() -> Optional[List[WeatherInfo]]:
     """
@@ -136,6 +136,7 @@ async def get_all_weather_info() -> Optional[List[WeatherInfo]]:
             weather_info_list = result.all()  
             return weather_info_list
     except Exception as e:
-        return None
+        LOGGER.error("Error occurred while getting data from DB: "
+        f"{e} (error)")
 
 
