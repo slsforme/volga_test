@@ -14,10 +14,10 @@
 Активация:
   Для MacOS и Linux:
 
-               source env/bin/activate
+       source env/bin/activate
   Для Windows:
   
-               env/Scripts/activate.bat
+       env/Scripts/activate.bat
 3. Скачиваем пакеты
 
         pip install -r requirements.txt
