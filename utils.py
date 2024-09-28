@@ -3,6 +3,17 @@ import asyncio
 
 
 async def convert_degrees_to_direction(degrees):
+    """
+    Преобразует направление ветра в градусах
+    в строковое обозначение направления.
+
+    :param degrees: Направление ветра в градусах.
+    :type degrees: float
+    :return: Строковое обозначение направления,
+        соответствующее градусам 
+    (например, "С" для северного направления).
+    :rtype: str
+    """
     DIRECTIONS: Tuple = (
         "С",  # Север
         "СВ", # Северо-восток
@@ -17,6 +28,14 @@ async def convert_degrees_to_direction(degrees):
     return DIRECTIONS[index]
 
 async def convert_weather_code_to_string(code: int) -> str:
+    """
+    Преобразует код погоды в текстовое описание погодных условий.
+
+    :param code: Код погоды.
+    :type code: int
+    :return: Текстовое описание погодных условий .
+    :rtype: Optional[str]
+    """
     WEATHER_STATUSES: Dict = {
         0: "Чистое небо",
         (1, 2, 3): "В основном ясно, частично облачно, и облачно",

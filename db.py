@@ -19,6 +19,9 @@ DATABASE_URL = "sqlite+aiosqlite:///weather.db"
 engine = create_async_engine(DATABASE_URL, echo=True)
 
 class WeatherInfo(Base):
+    """
+    Реализация класса таблицы в БД с информацией о погоде.
+    """
     __tablename__ = "weather_info"
 
     id = Column(Integer, primary_key=True)
@@ -33,6 +36,24 @@ class WeatherInfo(Base):
 async def create_and_add_info(temperature: float, direction: str,
                             pressure_above_sea: float, surface_pressure: 
                             float, precipation: float, current_weather: str):
+    """
+    Проверяет наличие таблицы `weather_info` в базе данных и, если её нет,
+     создаёт её. Затем добавляет новую запись о погоде в базу данных.
+
+    :param temperature: Температура (в градусах Цельсия).
+    :type temperature: float
+    :param direction: Направление ветра.
+    :type direction: str
+    :param pressure_above_sea: Давление на уровне моря (в мм рт. ст.).
+    :type pressure_above_sea: float
+    :param surface_pressure: Давление на поверхности (в мм рт. ст.).
+    :type surface_pressure: float
+    :param precipation: Количество осадков (в мм).
+    :type precipation: float
+    :param current_weather: Описание текущих погодных условий.
+    :type current_weather: str
+    :return: None
+    """
     try:
         async with engine.begin() as conn:
             def check_table_exists(connection):
@@ -45,13 +66,32 @@ async def create_and_add_info(temperature: float, direction: str,
             if not table_exists:
                 await conn.run_sync(Base.metadata.create_all)
             
-            await add_weather_info(temperature, direction, pressure_above_sea, 
-                                surface_pressure, precipation, current_weather)
+            await add_weather_info(temperature, direction, pressure_above_sea,
+                                surface_pressure, precipation,
+                                current_weather)
 
     except Exception as e:
         pass 
 async def add_weather_info(temperature, direction, pressure_above_sea, 
                             surface_pressure, precipation, current_weather):
+    """
+    Добавляет новую запись о погоде в таблицу `weather_info` 
+    в базе данных.
+
+    :param temperature: Температура (в градусах Цельсия).
+    :type temperature: float
+    :param direction: Направление ветра.
+    :type direction: str
+    :param pressure_above_sea: Давление на уровне моря (в мм рт. ст.).
+    :type pressure_above_sea: float
+    :param surface_pressure: Давление на поверхности (в мм рт. ст.).
+    :type surface_pressure: float
+    :param precipation: Количество осадков (в мм).
+    :type precipation: float
+    :param current_weather: Описание текущих погодных условий.
+    :type current_weather: str
+    :return: None
+    """
     try:
         async_session = sessionmaker(engine, class_=AsyncSession,
             expire_on_commit=False)
@@ -71,8 +111,16 @@ async def add_weather_info(temperature, direction, pressure_above_sea,
         pass
 
 async def get_all_weather_info() -> Optional[List[WeatherInfo]]:
+    """
+    Извлекает все записи из таблицы `weather_info` в базе данных.
+
+    :return: Список всех записей о погоде из базы данных. 
+        Если возникает ошибка или нет записей, возвращается None.
+    :rtype: Optional[List[WeatherInfo]]
+    """
     try:
-        async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+        async_session = sessionmaker(engine, class_=AsyncSession, 
+        expire_on_commit=False)
         async with async_session() as session:
             result = await session.execute(
                 select(
